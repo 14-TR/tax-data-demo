@@ -89,29 +89,36 @@ statesLayer.queryFeatures(query)
 //however, there are a whole bunch of state level datasets you can use here:
 // repository for american community survey services: https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services 
 
-//Create a feature layer from your URL
-  var medianIncomeUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/ACS_Median_Income_by_Race_and_Age_Selp_Emp_Boundaries/FeatureServer/0"
-  const medianIncomeLayer = new FeatureLayer({
-    url: medianIncomeUrl,
-    title: "Median Income",
-  });
+var lifeExpectancyUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/2022_County_Health_Rankings/FeatureServer/1";
+const lifeExpectancyLayer = new FeatureLayer({
+  url: lifeExpectancyUrl,
+  title: "Life Expectancy",
+});
+
+
+// //Create a feature layer from your URL
+//   var medianIncomeUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/ACS_Median_Income_by_Race_and_Age_Selp_Emp_Boundaries/FeatureServer/0"
+//   const medianIncomeLayer = new FeatureLayer({
+//     url: medianIncomeUrl,
+//     title: "Median Income",
+//   });
 
 //Make function to execture query
 var loadAdditionalData =function(){
   ////Create a new query object and give it the correct properties for what you want
-  let additionalQuery = medianIncomeLayer.createQuery();
+  let additionalQuery = lifeExpectancyLayer.createQuery();
   additionalQuery.returnGeometry = false;
   additionalQuery.outFields = "*"
   ////execute query on your new layer
- medianIncomeLayer.queryFeatures(additionalQuery).then(function(r){
+ lifeExpectancyLayer.queryFeatures(additionalQuery).then(function(r){
 console.log(r)
 r.features.forEach(function(feature){
    ///loop through the results to add new features to your stateObj
   if(feature.attributes['STUSPS'] != "DC"){
-      stateName = feature.attributes['NAME']
-      var income = feature.attributes['B19049_001E']
+      stateName = feature.attributes['STATE_NAME']
+      var life = feature.attributes['v147_rawvalue']
     
-      stateObj[stateName]['medianIncome'] = income
+      stateObj[stateName]['lifeExpectancy'] = life
   }
 
 })
@@ -158,7 +165,8 @@ loadAdditionalData()
                              grossDifference: 0,
                              percentDifference:0,
                              ////Add new row to states with no tax///
-                             medianIncome: value.medianIncome
+                             medianIncome: value.medianIncome,
+                             lifeExpectancy: value.lifeExpectancy
                           }
                       })
                       let gfx = new Graphic({
@@ -210,7 +218,8 @@ loadAdditionalData()
                             totalExemptions: Math.trunc(totalExemptions).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                             totalCredits: Math.trunc(totalCredits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
 ///////////Add new row here too //////////                            
-                            medianIncome: value.medianIncome
+                            medianIncome: value.medianIncome,
+                            lifeExpectancy: value.lifeExpectancy
 
                           }
                       })
